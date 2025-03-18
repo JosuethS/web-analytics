@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type AdmissionsBookedDate {
+  Day   BigInt
+  Month BigInt
+  Year  BigInt
+}
+
+type AdmissionsMadeDate {
+  Day   BigInt
+  Month BigInt
+  Year  BigInt
+}
+
+type ClientsAnalytics {
+  device_type      ClientsAnalyticsDeviceType    @map("device-type")
+  new_visitors     Int                           @map("new-visitors")
+  referal_source   ClientsAnalyticsReferalSource @map("referal-source")
+  session_duration Int                           @map("session-duration")
+  total_visitors   Int                           @map("total-visitors")
+}
+
+type ClientsAnalyticsDeviceType {
+  android Int
+  desktop Int
+  ios     Int
+  mobile  Int
+  tablet  Int
+}
+
+type ClientsAnalyticsReferalSource {
+  direct    Int
+  facebook  Int
+  google    Int
+  instagram Int
+  youtube   Int
+}
+
+type DaysOffWeekDays {
+  Friday    Boolean
+  Monday    Boolean
+  Saturday  Boolean
+  Sunday    Boolean
+  Thursday  Boolean
+  Tuesday   Boolean
+  Wednesday Boolean
+}
+
+type FeedbackCreated {
+  Day   Int
+  Month Int
+  Year  Int
+}
+
+type FormsQuestions {
+  Any_specific_pages_you_want_included                                         String  @map("Any specific pages you want included")
+  Deadline                                                                     String
+  Describe_your_business_in_as_much_detail_as_possible                         String  @map("Describe your business in as much detail as possible")
+  Desired_time_for_your_Meeting                                                String  @map("Desired time for your Meeting")
+  Do_you_have_a_logo                                                           String? @map("Do you have a logo")
+  Do_you_have_images_you_can_provide_that_will_be_used_on_our_website          String? @map("Do you have images you can provide that will be used on our website")
+  Have_you_had_a_website_in_the_past_                                          String? @map("Have you had a website in the past?")
+  Is_there_any_further_information_you_would_like_to_provide                   String  @map("Is there any further information you would like to provide")
+  List_any_goals_for_your_website                                              String  @map("List any goals for your website")
+  Main_Color                                                                   String  @map("Main-Color")
+  Meeting                                                                      String
+  Needed_Features_for_you_website                                              String  @map("Needed Features for you website")
+  Please_link_any_websites_by_URL_that_you_would_like_to_take_inspiration_from String  @map("Please link any websites by URL that you would like to take inspiration from")
+  Secondary_Color                                                              String  @map("Secondary-Color")
+  What_Category_describes_your_website_                                        String? @map("What Category describes your website?")
+  What_is_your_target_audience                                                 String  @map("What is your target audience")
+}
+
+type FormsSubmission {
+  Answer   String
+  Question String
+}
+
+type ProjectProgressComments {
+  commentContent String
+  commentor      String
+  id             String
+}
+
+model Admissions {
+  id         String               @id @default(auto()) @map("_id") @db.ObjectId
+  BookedDate AdmissionsBookedDate
+  BookedTime String
+  FormCode   String
+  MadeDate   AdmissionsMadeDate
+  business   String
+  email      String
+  name       String
+  phone      String
+  status     String
+}
+
+model Clients {
+  id            String            @id @default(auto()) @map("_id") @db.ObjectId
+  analytics     ClientsAnalytics?
+  business      String
+  email         String
+  ip            String
+  name          String
+  password      String
+  phone         Int
+  plan          String
+  root_password String            @map("root-password")
+  status        Boolean
+  website       String
+}
+
+model Codes {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  AccessCode String
+  Status     Boolean
+}
+
+model Days_Off {
+  id       String          @id @default(auto()) @map("_id") @db.ObjectId
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  Date     Json?
+  weekDays DaysOffWeekDays
+
+  @@map("Days-Off")
+}
+
+model Feedback {
+  id      String          @id @default(auto()) @map("_id") @db.ObjectId
+  Created FeedbackCreated
+  Field   String
+  Status  Boolean
+  Subject String
+  userID  String          @db.ObjectId
+}
+
+model Forms {
+  id         String            @id @default(auto()) @map("_id") @db.ObjectId
+  Business   String?
+  Email      String?
+  Name       String?
+  Phone      String?
+  Questions  FormsQuestions?
+  accessCode String
+  status     Boolean
+  submission FormsSubmission[]
+}
+
+model ProjectProgress {
+  id              String                    @id @default(auto()) @map("_id") @db.ObjectId
+  admissionID     String                    @db.ObjectId
+  assignedTo      String
+  businessName    String
+  column          String
+  comments        ProjectProgressComments[]
+  description     String
+  figmaLink       String
+  paymentReceived Boolean
+  priority        String
+  typeTags        String[]
+}
+
+model Request {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  clientid  String
+  date_made DateTime @db.Date
+  details   String
+  resolved  DateTime @db.Date
+  status    Boolean
+  subject   String
+  warning   Boolean
+}
+
+model Team {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
